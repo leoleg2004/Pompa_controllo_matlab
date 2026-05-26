@@ -58,15 +58,18 @@ Il sistema continuo viene quindi discretizzato con un tempo di campionamento $T_
 Il sistema presenta un forte accoppiamento incrociato (MIMO): la pompa 2 influenza contemporaneamente sia il livello $h_1$ sia il livello $h_2$. Per poter controllare in modo indipendente i due livelli con regolatori SISO separati ($C_1$ e $C_2$), viene progettata una matrice di precompensazione (disaccoppiatore) $M(z)$ tale che la funzione di trasferimento complessiva vista dai controllori sia diagonale.
 
 Data la matrice di trasferimento del sistema $G(z)$:
+
 $$G(z) = \begin{bmatrix} G_{11}(z) & G_{12}(z) \\ G_{21}(z) & G_{22}(z) \end{bmatrix}$$
 
 La matrice di disaccoppiamento semplificata ha la forma:
+
 $$M(z) = \begin{bmatrix} 1 & M_{12}(z) \\ 0 & 1 \end{bmatrix}$$
+
 con:
+
 $$M_{12}(z) = -G_{12}(z) \cdot G_{22}^{-1}(z)$$
 
 Questo cancella l'effetto dell'ingresso $v_2$ (uscita del regolatore $C_2$) sulla dinamica del primo serbatoio.
-
 ---
 
 ## 4. Controllo Predittivo (MPC)
