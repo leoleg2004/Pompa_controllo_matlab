@@ -41,14 +41,16 @@ Per progettare i regolatori lineari, il sistema viene linearizzato attorno a un 
 * $h_{2, ref} = 1.2\text{ m}$
 
 All'equilibrio, gli ingressi costanti di mantenimento sono pari a:
+
 $$u_{1, ref} = u_{2, ref} = k\sqrt{h_{2, ref}}$$
 
 Definendo le variabili di deviazione rispetto al punto di equilibrio $\tilde{x} = x - x_{ref}$ e $\tilde{u} = u - u_{ref}$, si ottiene il modello nello spazio di stato continuo $\dot{\tilde{x}} = A\tilde{x} + B\tilde{u}$:
+
 $$A = \begin{bmatrix} 0 & 0 \\ 0 & -\frac{k}{2\sqrt{h_{2, ref}}} \end{bmatrix}, \quad B = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}$$
+
 $$C = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}, \quad D = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$
 
 Il sistema continuo viene quindi discretizzato con un tempo di campionamento $T_s = 0.1\text{ s}$ per l'implementazione digitale del controllo.
-
 ---
 
 ## 3. Progettazione dei Disaccoppiatori
