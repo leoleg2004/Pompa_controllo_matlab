@@ -1,0 +1,77 @@
+clc
+clearvars
+%% Parametri del problema
+A = [1 1; 0 1];
+B = [0; 1];
+Q = eye(2);
+R = 1;
+N = 5;
+S = 100 * eye(2);
+x0 = [-3; 1];
+
+%% 1Soluzione in anello chiuso
+
+% Inizializzazione matrici per memorizzare i risultati
+P = zeros(2, 2, N+1);
+K = zeros(1, 2, N);
+P(:,:,N+1) = S; % Condizione finale
+
+% 1. Ricorsione all'indietro (Riccati)
+for j = N:-1:1
+    % Calcolo del guadagno K(j)
+    % Nota: Usiamo P(:,:,j+1) per calcolare P(:,:,j)
+    K(:,:,j) = (R + B' * P(:,:,j+1) * B) \ (B' * P(:,:,j+1) * A);
+    
+    % Aggiornamento di P(j)
+    P(:,:,j) = Q + A' * P(:,:,j+1) * A - A' * P(:,:,j+1) * B * K(:,:,j);
+end
+
+% 2. Simulazione in avanti (Anello Chiuso)
+x = zeros(2, N+1);
+x(:,1) = x0;
+u = zeros(1, N);
+
+for j = 1:N
+    u(j) = -K(:,:,j) * x(:,j);
+    x(:,j+1) = A * x(:,j) + B * u(j);
+end
+
+%% 2. Costruzione Matrici di Predizione (Anello Aperto / QP)
+% Dobbiamo scrivere lo stato futuro come x = Cal_A*x0 + Cal_B*u
+Cal_A = []; 
+Cal_B = [];
+
+for i = 1:N
+    Cal_A = [Cal_A; A^i];
+    riga_B = [];
+    for j = 1:N
+        if j <= i
+            riga_B = [riga_B, A^(i-j)*B];
+        else
+            riga_B = [riga_B, zeros(2,1)];
+        end
+    end
+    Cal_B = [Cal_B; riga_B];
+end
+
+% Matrici di peso estese
+Cal_Q = blkdiag(kron(eye(N-1), Q), S);
+Cal_R = kron(eye(N), R);
+
+%% 3. Soluzione tramite Quadratic Programming (Punto 3 slide)
+% Calcolo H e f come da screenshot
+H = 2 * (Cal_B' * Cal_Q * Cal_B + Cal_R);
+f = 2 * (x0' * Cal_A' * Cal_Q * Cal_B)';
+
+% Risoluzione con quadprog (senza vincoli)
+u_qp = quadprog(H, f);
+
+%% 4. Soluzione Analitica (Anello Aperto - Punto 2 slide)
+% La soluzione ottima di un problema quadratico senza vincoli è u = -inv(H)*f
+u_ol = -H \ f;
+
+% Visualizzazione Risultati
+disp('Sequenza di controllo ottima (QP):')
+disp(u_qp)
+disp('Sequenza di controllo ottima (Open Loop):')
+disp(u_ol)
